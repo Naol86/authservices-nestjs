@@ -54,7 +54,7 @@ export class UsersService {
 
   async sendVerificationEmail(email: string, token: string) {
     // Send email with verification link
-    const verificationLink = `${process.env.BACKEND_URL}/verify-email?token=${token}`;
+    const verificationLink = `${process.env.BACKEND_URL}/auth/verify-email?token=${token}`;
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -82,10 +82,14 @@ export class UsersService {
     if (!user) {
       return false;
     }
-    await this.prisma.user.update({
+    const res = await this.prisma.user.update({
       where: { id: user.id },
       data: { isEmailVerified: true, verificationToken: null },
     });
+    if (!res) {
+      return false;
+    }
+    return true;
   }
 
   async comparePasswords(password: string, hashedPassword: string) {

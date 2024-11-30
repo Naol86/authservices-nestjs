@@ -15,7 +15,7 @@ export class AuthService {
     const { email, firstName, lastName, picture, provider, providerId } =
       profile;
 
-    const user = await this.usersService.findByEmail(email);
+    let user = await this.usersService.findByEmail(email);
     if (!user) {
       return this.usersService.create({
         email,
@@ -26,12 +26,19 @@ export class AuthService {
         provider,
         providerId,
       });
+    } else if (!user.isEmailVerified) {
+      user = await this.usersService.update(user.id, {
+        isEmailVerified: true,
+        verificationToken: null,
+        provider: 'google',
+      });
     }
+
     return user;
   }
 
   async login(user: User): Promise<{ accessToken: string; user: User }> {
-    const payload = { sub: user.id, email: user.email };
+    const payload = { userId: user.id, email: user.email };
     const token = this.jwtService.sign(payload);
     // await this.usersService.updateToken(user.id, token);
     delete user.password;
