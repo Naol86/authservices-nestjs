@@ -89,12 +89,12 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  @Redirect(`${process.env.FRONTEND_URL}/api/callback`, 302)
+  @Redirect(`${process.env.FRONTEND_URL}/callback`, 302)
   async googleAuthCallback(@Req() req) {
     const user = await this.authService.validateGoogleUser(req.user);
     const temp = await this.authService.login(user);
     return {
-      url: `${process.env.FRONTEND_URL}/api/callback?token=${temp.accessToken}`,
+      url: `${process.env.FRONTEND_URL}/callback?token=${temp.accessToken}`,
     };
   }
 
