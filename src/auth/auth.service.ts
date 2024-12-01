@@ -33,6 +33,11 @@ export class AuthService {
         provider: 'google',
       });
     }
+    if (!user.profilePicture) {
+      user = await this.usersService.update(user.id, {
+        profilePicture: picture,
+      });
+    }
 
     return user;
   }

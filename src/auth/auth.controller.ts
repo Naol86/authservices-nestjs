@@ -5,6 +5,7 @@ import {
   Post,
   Query,
   Req,
+  Redirect,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -88,8 +89,21 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
+  @Redirect(`${process.env.FRONTEND_URL}/api/callback`, 302)
   async googleAuthCallback(@Req() req) {
     const user = await this.authService.validateGoogleUser(req.user);
-    return this.authService.login(user);
+    const temp = await this.authService.login(user);
+    return {
+      url: `${process.env.FRONTEND_URL}/api/callback?token=${temp.accessToken}`,
+    };
+  }
+
+  @Get('whoami')
+  @UseGuards(AuthGuard('jwt'))
+  async whoAmI(@Req() req) {
+    const user = req.user;
+    const userRes = await this.usersService.findByEmail(user.email);
+    const { password: _, ...result } = userRes;
+    return result;
   }
 }
