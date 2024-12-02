@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Sender {
+  user
+  system
+}
+
 model User {
   id                Int      @id @default(autoincrement())
   firstName         String
@@ -26,4 +31,28 @@ model User {
   verificationToken String?
   provider          String? // Local, Google, Facebook, etc.
   providerId        String? // Unique ID for social login
+
+  Chats Chats[]
+}
+
+model Chats {
+  id         String   @id @default(uuid())
+  title      String?
+  user_id    Int
+  created_at DateTime @default(now())
+
+  User User @relation(fields: [user_id], references: [id])
+
+  Messages Messages[]
+}
+
+model Messages {
+  id      String @id @default(uuid())
+  role    Sender
+  content String
+  chat_id String
+
+  Chat Chats @relation(fields: [chat_id], references: [id])
+
+  created_at DateTime @default(now())
 }
