@@ -11,12 +11,13 @@ export class UsersService {
 
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase() },
     });
   }
 
   async create(data: Prisma.UserCreateInput) {
-    return this.prisma.user.create({ data });
+    const d = { ...data, email: data.email.toLowerCase() };
+    return this.prisma.user.create({ data: d });
   }
 
   async update(id: number, data: Prisma.UserUpdateInput) {

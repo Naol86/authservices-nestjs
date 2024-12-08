@@ -8,7 +8,8 @@ export class ChatsGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const chatId = request.params.id;
-    const userId = request.user.id;
+    const userId = request.user.userId;
+    // console.log(userId, chatId, request.params, request.user);
     // any validation logic here
     const chat = await this.prisma.chats.findUnique({
       where: {

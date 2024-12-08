@@ -33,6 +33,17 @@ export class ChatsService {
     return newChat;
   }
 
+  async getChatMessages(chatId: string): Promise<Messages[]> {
+    return this.prisma.messages.findMany({
+      where: {
+        chat_id: chatId,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+  }
+
   async getLastChats(chatId: string): Promise<Messages[]> {
     const chats = await this.prisma.messages.findMany({
       where: {
@@ -44,6 +55,18 @@ export class ChatsService {
       take: 30,
     });
 
+    return chats;
+  }
+
+  async getChats(userId: number) {
+    const chats = await this.prisma.chats.findMany({
+      where: {
+        user_id: userId,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
     return chats;
   }
 
@@ -59,6 +82,24 @@ export class ChatsService {
       role: 'user',
       content: message,
     });
-    return this.aiService.sendMessages(messages);
+    const response = await this.aiService.sendMessages(messages);
+    if (response) {
+      await this.prisma.messages.create({
+        data: {
+          chat_id: chatId,
+          role: 'user',
+          content: message,
+        },
+      });
+      await this.prisma.messages.create({
+        data: {
+          chat_id: chatId,
+          role: 'system',
+          content: response.response.content,
+        },
+      });
+    }
+
+    return response;
   }
 }
