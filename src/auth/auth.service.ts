@@ -52,7 +52,8 @@ export class AuthService {
 
   getGoogleAuthUrl(): string {
     const clientId = process.env.GOOGLE_CLIENT_ID;
-    const redirectUri = 'http://localhost:8000/auth/google/callback';
+    const redirectUri =
+      'https://stuck-selma-naolteach-82254a1d.koyeb.app/auth/google/callback';
     const scope = [
       'https://www.googleapis.com/auth/userinfo.email',
       'https://www.googleapis.com/auth/userinfo.profile',
