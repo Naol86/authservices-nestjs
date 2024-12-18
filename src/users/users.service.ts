@@ -31,6 +31,10 @@ export class UsersService {
     // check if the user is already in the database
     const user = await this.findByEmail(userData.email);
     if (user) {
+      if (!user.isEmailVerified) {
+        // Resend verification email
+        await this.sendVerificationEmail(user.email, user.verificationToken);
+      }
       return false;
     }
 
