@@ -7,6 +7,8 @@ import {
   Req,
   Redirect,
   UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -24,10 +26,17 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto) {
     const user = await this.usersService.register(registerDto);
     if (!user) {
-      return {
-        success: false,
-        message: 'Email already exists',
-      };
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Email already exists',
+        },
+        HttpStatus.CONFLICT,
+      );
+      // return {
+      //   success: false,
+      //   message: 'Email already exists',
+      // };
     }
     return {
       success: true,
