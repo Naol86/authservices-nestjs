@@ -33,7 +33,9 @@ export class UsersService {
     if (user) {
       if (!user.isEmailVerified) {
         // Resend verification email
-        await this.sendVerificationEmail(user.email, user.verificationToken);
+        const verificationToken = randomBytes(32).toString('hex');
+        await this.update(user.id, { verificationToken });
+        await this.sendVerificationEmail(user.email, verificationToken);
       }
       return false;
     }
